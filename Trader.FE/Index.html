@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Trading App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Title */
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .buttons {
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button i {
+            margin-right: 5px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        /* Action Buttons */
+        .delete-btn {
+            background: #dc3545;
+        }
+        .delete-btn:hover {
+            background: #a71d2a;
+        }
+
+        input {
+            width: 90%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Stock Trading App</h1>
+        
+        <div class="buttons">
+            <button id="placeOrderBtn"><i class="fas fa-shopping-cart"></i> Place Order</button>
+            <button id="addRowBtn"><i class="fas fa-plus"></i> Add Row</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial No</th>
+                    <th>Scrip</th>
+                    <th>Quantity</th>
+                    <th>Factor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="stockTableBody">
+                <!-- Rows will be added dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let tableBody = document.getElementById("stockTableBody");
+            let addRowBtn = document.getElementById("addRowBtn");
+            let placeOrderBtn = document.getElementById("placeOrderBtn");
+            let serialNo = 1;
+
+            // Add Row Function
+            addRowBtn.addEventListener("click", function () {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${serialNo++}</td>
+                    <td><input type="text" placeholder="Enter Scrip"></td>
+                    <td><input type="number" placeholder="Quantity"></td>
+                    <td><input type="number" placeholder="Factor"></td>
+                    <td><button class="delete-btn"><i class="fas fa-trash"></i></button></td>
+                `;
+                tableBody.appendChild(row);
+
+                // Add Remove Row Event
+                row.querySelector(".delete-btn").addEventListener("click", function () {
+                    row.remove();
+                });
+            });
+
+            // Place Order Function
+            placeOrderBtn.addEventListener("click", async function () {
+                try {
+                    let response = await fetch("http://localhost:5042/api/stocks/place-order", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    let data = await response.json();
+                    alert(data.message);
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Failed to place order.");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

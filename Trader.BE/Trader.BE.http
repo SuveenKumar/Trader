@@ -1,0 +1,6 @@
+@Trader.BE_HostAddress = http://localhost:5042
+
+GET {{Trader.BE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
