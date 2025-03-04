@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
 // Add SignalR as a singleton
 builder.Services.AddSignalR();
 //builder.Services.AddSingleton<IntradayServer>();
-//builder.Services.AddSingleton<StockHub>(); // Ensure only ONE instance exists
+builder.Services.AddSingleton<StockHub>(); // Ensure only ONE instance exists
 
 builder.Services.AddControllers();
 
@@ -30,6 +30,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
-//app.MapHub<StockHub>("/stockHub"); // SignalR Hub endpoint
+app.MapHub<StockHub>("/stockHub"); // SignalR Hub endpoint
 
 app.Run();

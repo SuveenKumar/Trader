@@ -25,7 +25,7 @@ public class LoginManager
     {
         cancellationTokenSource = new CancellationTokenSource();
         listener = new HttpListener();
-        listener.Prefixes.Add("http://localhost:8080/");
+        listener.Prefixes.Add("http://0.0.0.0:8080/");
 
         try
         {
