@@ -126,7 +126,25 @@
                     setTimeout(start, 5000);
                 }
             }
+			
+			async function login() {
+                try {
+                    let response = await fetch("http://localhost:5042/api/stocks/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" }
+                    });
+
+                    let data = await response.json();
+                    alert(data.message);
+                    console.log("📦 API Response:", data);
+                } catch (error) {
+                    console.error("❌ Error:", error);
+                    alert("Failed to place order.");
+                }
+            }
+			
             start();
+			login();
 
             // 🔥 Receive stock updates from backend
             connection.on("ReceiveStockUpdate", (scrip, quantity, factor, price) => {

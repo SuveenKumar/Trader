@@ -6,22 +6,25 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enable CORS (Allow frontend to connect to backend)
+// Enable CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
-        builder.SetIsOriginAllowed(_ => true) // Allows all origins
+        builder.SetIsOriginAllowed(_ => true)
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials()); // Required for SignalR
+               .AllowCredentials());
 });
 
-// Add SignalR and Controllers
+// Add SignalR as a singleton
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IntradayServer>();
+builder.Services.AddSingleton<StockHub>(); // Ensure only ONE instance exists
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
-app.UseCors("AllowAll"); // Apply CORS policy
+app.UseCors("AllowAll");
 app.UseRouting();
 app.UseAuthorization();
 
@@ -29,11 +32,3 @@ app.MapControllers();
 app.MapHub<StockHub>("/stockHub"); // SignalR Hub endpoint
 
 app.Run();
-
-public class StockHub : Hub
-{
-    public async Task SendStockUpdate(string scrip, int quantity, decimal factor, decimal price)
-    {
-        await Clients.All.SendAsync("ReceiveStockUpdate", scrip, quantity, factor, price);
-    }
-}
