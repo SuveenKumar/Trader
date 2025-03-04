@@ -21,10 +21,10 @@ public class StockController : ControllerBase
         //_intradayServer = intradayServer;
         //AvailableScrips = TradingConstants.NIFTY100.ToList();
         //Stocks = new ObservableCollection<StockItem>();
-        _intradayServer.ServerConnected -= OnServerConnected;
-        _intradayServer.ServerDisconnected -= OnServerDisconnected;
-        _intradayServer.ServerConnected += OnServerConnected;
-        _intradayServer.ServerDisconnected += OnServerDisconnected;
+        //_intradayServer.ServerConnected -= OnServerConnected;
+        //_intradayServer.ServerDisconnected -= OnServerDisconnected;
+        //_intradayServer.ServerConnected += OnServerConnected;
+        //_intradayServer.ServerDisconnected += OnServerDisconnected;
     }
 
     //[HttpPost("place-order")]
