@@ -15,16 +15,16 @@ public class StockController : ControllerBase
     private readonly IHubContext<StockHub> _hubContext;
     private readonly IntradayServer _intradayServer;
 
-    public StockController(IHubContext<StockHub> hubContext/*, IntradayServer intradayServer*/)
+    public StockController(IHubContext<StockHub> hubContext, IntradayServer intradayServer)
     {
         _hubContext = hubContext;
-        //_intradayServer = intradayServer;
+        _intradayServer = intradayServer;
         //AvailableScrips = TradingConstants.NIFTY100.ToList();
         //Stocks = new ObservableCollection<StockItem>();
-        //_intradayServer.ServerConnected -= OnServerConnected;
-        //_intradayServer.ServerDisconnected -= OnServerDisconnected;
-        //_intradayServer.ServerConnected += OnServerConnected;
-        //_intradayServer.ServerDisconnected += OnServerDisconnected;
+        _intradayServer.ServerConnected -= OnServerConnected;
+        _intradayServer.ServerDisconnected -= OnServerDisconnected;
+        _intradayServer.ServerConnected += OnServerConnected;
+        _intradayServer.ServerDisconnected += OnServerDisconnected;
     }
 
     //[HttpPost("place-order")]
