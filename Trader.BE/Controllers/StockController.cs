@@ -18,7 +18,7 @@ public class StockController : ControllerBase
     public StockController(IHubContext<StockHub> hubContext, IntradayServer intradayServer)
     {
         _hubContext = hubContext;
-        _intradayServer = intradayServer;
+        //_intradayServer = intradayServer;
         //AvailableScrips = TradingConstants.NIFTY100.ToList();
         //Stocks = new ObservableCollection<StockItem>();
         _intradayServer.ServerConnected -= OnServerConnected;
