@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 public class StockController : ControllerBase
 {
     private readonly IHubContext<StockHub> _hubContext;
-    private readonly IntradayServer _intradayServer;
+    //private readonly IntradayServer _intradayServer;
 
-    public StockController(IHubContext<StockHub> hubContext, IntradayServer intradayServer)
+    public StockController(IHubContext<StockHub> hubContext/*, IntradayServer intradayServer*/)
     {
         _hubContext = hubContext;
         //_intradayServer = intradayServer;
@@ -74,11 +74,11 @@ public class StockController : ControllerBase
 
     private async void OnServerConnected(object? sender, EventArgs e)
     {
-        var holdings = _intradayServer.kite.GetHoldings();
-        foreach (var holding in holdings)
-        {
-            await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", holding.TradingSymbol, holding.Quantity, holding.Price, holding.LastPrice);
-        }
+        ////var holdings = _intradayServer.kite.GetHoldings();
+        //foreach (var holding in holdings)
+        //{
+        //    await _hubContext.Clients.All.SendAsync("ReceiveStockUpdate", holding.TradingSymbol, holding.Quantity, holding.Price, holding.LastPrice);
+        //}
     }
 
     //public event PropertyChangedEventHandler? PropertyChanged;
