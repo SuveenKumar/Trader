@@ -10,7 +10,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Markup;
 using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class IntradayServer
 {
