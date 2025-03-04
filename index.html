@@ -129,7 +129,7 @@
 			
 			async function login() {
                 try {
-                    let response = await fetch("http://localhost:5042/api/stocks/login", {
+                    let response = await fetch("https://trader-production-fc2a.up.railway.app/api/stocks/login", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" }
                     });
