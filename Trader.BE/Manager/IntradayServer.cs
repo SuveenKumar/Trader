@@ -1,15 +1,8 @@
 ﻿using KiteConnect;
-using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Net;
-using System.Net.Http;
-using System.Numerics;
 using System.Text.Json;
-using System.Windows;
-using System.Windows.Markup;
-using static System.Net.WebRequestMethods;
+
 
 public class IntradayServer
 {
@@ -19,18 +12,33 @@ public class IntradayServer
     public Kite kite;
 
     private Ticker ticker;
-
-    public LoginManager _loginManager;
-
     public EventHandler ServerConnected;
     public EventHandler ServerDisconnected;
 
     private ObservableCollection<StockItem> _selectedStocks;
+
+    public string AccessToken;
+
     public IntradayServer()
     {
         kite = new Kite(TradingConstants.APIKEY);
-        _loginManager = new LoginManager(kite);
-        _loginManager.OnLogin += OnLoggedIn;
+    }
+
+    public async Task ProcessLoginAsync(string requestToken)
+    {
+        try
+        {
+            var user = await Task.Run(() => kite.GenerateSession(requestToken, TradingConstants.APISECRET));
+            AccessToken = user.AccessToken;
+            kite.SetAccessToken(user.AccessToken);
+        }
+        catch (Exception ex)
+        {
+            //Dispatcher.Invoke(() =>
+            //{
+            //    MessageBox.Show($"Login failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //});
+        }
     }
 
     private void OnLoggedIn(object? sender, EventArgs e)
@@ -41,7 +49,7 @@ public class IntradayServer
 
     private void InitTicker()
     {
-        ticker = new Ticker(TradingConstants.APIKEY, _loginManager.AccessToken);
+        ticker = new Ticker(TradingConstants.APIKEY, AccessToken);
         SubscribeToTickerEvents();
     }
 

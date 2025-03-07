@@ -113,7 +113,7 @@
 
             // Create a SignalR connection
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl("https://trader-production-fc2a.up.railway.app/stockHub") // Ensure backend is running at this port
+                .withUrl("http://localhost:8080/stockHub") // Ensure backend is running at this port
                 .configureLogging(signalR.LogLevel.Information)
                 .build();
 
@@ -121,30 +121,24 @@
                 try {
                     await connection.start();
                     console.log("✅ Connected to SignalR.");
+                    Refresh();
                 } catch (err) {
                     console.error("❌ Error connecting to SignalR:", err);
+                    alert(err);
                     setTimeout(start, 5000);
                 }
             }
 			
-			async function login() {
+            async function Refresh() {
                 try {
-                    let response = await fetch("https://trader-production-fc2a.up.railway.app/api/stocks/login", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" }
-                    });
-
-                    let data = await response.json();
-                    alert(data.message);
-                    console.log("📦 API Response:", data);
+                    await connection.invoke("Refresh");
                 } catch (error) {
-                    console.error("❌ Error:", error);
-                    alert("Failed to place order.");
+                    console.error("❌ Error calling SignalR login:", error);
+                    alert("Login request failed.");
                 }
             }
 			
             start();
-			login();
 
             // 🔥 Receive stock updates from backend
             connection.on("ReceiveStockUpdate", (scrip, quantity, factor, price) => {
@@ -166,6 +160,45 @@
                     row.remove();
                 });
             });
+
+            window.onclose = function () {
+                alert("Unload");
+            };
+
+            connection.on("OnRefresh", (loginURL) => {
+                alert("Current URL: " + loginURL);
+                let loginWindow = window.open(loginURL, "_blank");
+                //loginWindow.close();
+                //let checkLogin = setInterval(() => {
+                //    if (loginWindow.closed) {
+                //        alert("Current URL: " + loginWindow.closed);
+
+                //        clearInterval(checkLogin);
+                //        console.log("Login window closed. Check local storage for token.");
+                //        return;
+                //    }
+
+                //    try {
+                //        let currentURL = loginWindow.location.href;
+                //        alert("Current URL: "+currentURL);
+                //        if (currentURL.startsWith("http://localhost:8080")) {
+                //            let urlParams = new URLSearchParams(loginWindow.location.search);
+                //            let requestToken = urlParams.get("request_token");
+
+                //            if (requestToken) {
+                //                localStorage.setItem("request_token", requestToken);
+                //                console.log("✅ Request Token:", requestToken);
+                //                alert("Login successful! Token stored.");
+                //                loginWindow.close();
+                //                clearInterval(checkLogin);
+                //            }
+                //        }
+                //    } catch (error) {
+                //        // Ignore cross-origin errors
+                //    }
+                //}, 1000);
+            });
+
 
             // 🔥 Add Row Function (manual input)
             addRowBtn.addEventListener("click", function () {

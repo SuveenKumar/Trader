@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:8080");
+builder.WebHost.UseUrls("http://localhost:8080/");
 
 // Enable CORS
 builder.Services.AddCors(options =>
@@ -19,17 +19,14 @@ builder.Services.AddCors(options =>
 
 // Add SignalR as a singleton
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<StockHub>();
 builder.Services.AddSingleton<IntradayServer>();
-builder.Services.AddSingleton<StockHub>(); // Ensure only ONE instance exists
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 app.UseCors("AllowAll");
-app.UseRouting();
-app.UseAuthorization();
 
-app.MapControllers();
 app.MapHub<StockHub>("/stockHub"); // SignalR Hub endpoint
 
 app.Run();
