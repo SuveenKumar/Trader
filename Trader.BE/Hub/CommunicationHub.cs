@@ -3,16 +3,11 @@ using Microsoft.AspNetCore.SignalR;
 
 public class CommunicationHub : Hub
 {
-    public delegate Task OnRefreshReceived(string message);
+    // Define the delegate type for handling messages
+    public delegate Task MessageReceivedHandler(string message);
 
-    private OrderManager _orderManager;
-    private LoginManager _loginManager;
-
-    public CommunicationHub(OrderManager orderManager, LoginManager loginManager)
-    {
-        _loginManager = loginManager;
-        _orderManager = orderManager;
-    }
+    // Define the event based on the delegate
+    public static event MessageReceivedHandler OnMessageReceived;
 
     public async Task SendStockUpdate(string scrip, int quantity, decimal factor, decimal price)
     {
@@ -27,7 +22,7 @@ public class CommunicationHub : Hub
     public async Task Refresh()
     {
         var url = _orderManager.GetLoginURL();
-        await OnRefreshReceived.Invoke();
+        await OnMessageReceived.Invoke("asd");
         await Clients.Caller.SendAsync("OnRefresh", url);
     }
 }
