@@ -1,3 +1,4 @@
+using KiteConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
@@ -19,14 +20,19 @@ builder.Services.AddCors(options =>
 
 // Add SignalR as a singleton
 builder.Services.AddSignalR();
-builder.Services.AddSingleton<StockHub>();
-builder.Services.AddSingleton<IntradayServer>();
+builder.Services.AddSingleton<CommunicationHub>();
+builder.Services.AddSingleton<OrderManager>();
+builder.Services.AddSingleton<LoginManager>();
+builder.Services.AddSingleton(provider =>
+{
+    return new Kite(TradingConstants.APIKEY);  // Register the service with the apiKey
+});
 
-builder.Services.AddControllers();
-
+//builder.Services.AddControllers();
+//builder.Services.AddHostedService<TraderAC>(); // This will run on startup
 var app = builder.Build();
 app.UseCors("AllowAll");
 
-app.MapHub<StockHub>("/stockHub"); // SignalR Hub endpoint
+app.MapHub<CommunicationHub>("/stockHub"); // SignalR Hub endpoint
 
 app.Run();

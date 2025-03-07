@@ -2,56 +2,42 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
 
-
-public class IntradayServer
+public class OrderManager
 {
-    public List<KiteConnect.Instrument> AvailableScrips = new List<KiteConnect.Instrument>();
+    public List<Instrument> AvailableScrips = new List<Instrument>();
     decimal DefaultFactor = 1.0123m;
 
-    public Kite kite;
+    public Kite _kite;
 
     private Ticker ticker;
     public EventHandler ServerConnected;
     public EventHandler ServerDisconnected;
 
     private ObservableCollection<StockItem> _selectedStocks;
-
-    public string AccessToken;
-
-    public IntradayServer()
+    public OrderManager(Kite kite)
     {
-        kite = new Kite(TradingConstants.APIKEY);
-    }
-
-    public async Task ProcessLoginAsync(string requestToken)
-    {
-        try
-        {
-            var user = await Task.Run(() => kite.GenerateSession(requestToken, TradingConstants.APISECRET));
-            AccessToken = user.AccessToken;
-            kite.SetAccessToken(user.AccessToken);
-        }
-        catch (Exception ex)
-        {
-            //Dispatcher.Invoke(() =>
-            //{
-            //    MessageBox.Show($"Login failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //});
-        }
+        _kite = kite;
     }
 
     private void OnLoggedIn(object? sender, EventArgs e)
     {
-        AvailableScrips = kite.GetInstruments().ToList();
-        InitTicker();
+        AvailableScrips = _kite.GetInstruments().ToList();
+        //InitTicker();
     }
 
-    private void InitTicker()
+    public void InitTicker(string accessToken)
     {
-        ticker = new Ticker(TradingConstants.APIKEY, AccessToken);
+        ticker = new Ticker(TradingConstants.APIKEY, accessToken);
         SubscribeToTickerEvents();
     }
+
+    //    public async Task Refresh()
+    //    {
+    //        var url = _orderManager.GetLoginURL();
+    //        await Clients.Caller.SendAsync("OnRefresh", url);
+    //    }
 
     private void SubscribeToTickerEvents()
     {
@@ -127,7 +113,7 @@ public class IntradayServer
 
     private void PlaceReverseBuyOrder(Order OrderData)
     {
-        var ltp = kite.GetLTP(new string[] { OrderData.InstrumentToken.ToString() })[OrderData.InstrumentToken.ToString()].LastPrice;
+        var ltp = _kite.GetLTP(new string[] { OrderData.InstrumentToken.ToString() })[OrderData.InstrumentToken.ToString()].LastPrice;
         decimal? factor = _selectedStocks.FirstOrDefault(item => item.Scrip == OrderData.Tradingsymbol)?.Factor;
         if (factor.HasValue)
         {
@@ -140,7 +126,7 @@ public class IntradayServer
 
         try
         {
-            Dictionary<string, dynamic> response = kite.PlaceOrder(
+            Dictionary<string, dynamic> response = _kite.PlaceOrder(
             Exchange: OrderData.Exchange,
             TradingSymbol: OrderData.Tradingsymbol,
             TransactionType: KiteConnect.Constants.TRANSACTION_TYPE_BUY,
@@ -159,7 +145,7 @@ public class IntradayServer
 
     private void PlaceReverseSellOrder(Order OrderData)
     {
-        var ltp = kite.GetLTP(new string[] { OrderData.InstrumentToken.ToString() })[OrderData.InstrumentToken.ToString()].LastPrice;
+        var ltp = _kite.GetLTP(new string[] { OrderData.InstrumentToken.ToString() })[OrderData.InstrumentToken.ToString()].LastPrice;
         var factor = _selectedStocks.FirstOrDefault(item => item.Scrip == OrderData.Tradingsymbol)?.Factor;
         if (factor.HasValue)
         {
@@ -172,7 +158,7 @@ public class IntradayServer
 
         try
         {
-            Dictionary<string, dynamic> response = kite.PlaceOrder(
+            Dictionary<string, dynamic> response = _kite.PlaceOrder(
             Exchange: OrderData.Exchange,
             TradingSymbol: OrderData.Tradingsymbol,
             TransactionType: KiteConnect.Constants.TRANSACTION_TYPE_SELL,
@@ -199,10 +185,10 @@ public class IntradayServer
             {
                 continue;
             }
-            var price = kite.GetOHLC(new string[] { stock.InstrumentToken.ToString() })[stock.InstrumentToken.ToString()].Open;
+            var price = _kite.GetOHLC(new string[] { stock.InstrumentToken.ToString() })[stock.InstrumentToken.ToString()].Open;
             try
             {
-                Dictionary<string, dynamic> response = kite.PlaceOrder(
+                Dictionary<string, dynamic> response = _kite.PlaceOrder(
                 Exchange: KiteConnect.Constants.EXCHANGE_NSE,
                 TradingSymbol: stock.Scrip,
                 TransactionType: KiteConnect.Constants.TRANSACTION_TYPE_BUY,
@@ -239,6 +225,11 @@ public class IntradayServer
                 return null;
             }
         }
+    }
+
+    public CancellationToken GetLoginURL()
+    {
+        throw new NotImplementedException();
     }
 }
 

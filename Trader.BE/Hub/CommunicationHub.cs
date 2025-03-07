@@ -1,12 +1,17 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using KiteConnect;
+using Microsoft.AspNetCore.SignalR;
 
-public class StockHub : Hub
+public class CommunicationHub : Hub
 {
-    private IntradayServer _intradayServer;
+    public delegate Task OnRefreshReceived(string message);
 
-    public StockHub(IntradayServer intradayServer)
+    private OrderManager _orderManager;
+    private LoginManager _loginManager;
+
+    public CommunicationHub(OrderManager orderManager, LoginManager loginManager)
     {
-        _intradayServer = intradayServer;
+        _loginManager = loginManager;
+        _orderManager = orderManager;
     }
 
     public async Task SendStockUpdate(string scrip, int quantity, decimal factor, decimal price)
@@ -21,7 +26,8 @@ public class StockHub : Hub
 
     public async Task Refresh()
     {
-        var url = _intradayServer.kite.GetLoginURL();
+        var url = _orderManager.GetLoginURL();
+        await OnRefreshReceived.Invoke();
         await Clients.Caller.SendAsync("OnRefresh", url);
     }
 }
