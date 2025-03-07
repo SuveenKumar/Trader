@@ -64,3 +64,15 @@ using System.Runtime.CompilerServices;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+public class StockHub : Hub
+{
+    public StockHub()
+    {
+        Console.WriteLine();
+    }
+    public async Task SendStockUpdate(string scrip, int quantity, decimal factor, decimal price)
+    {
+        await Clients.All.SendAsync("ReceiveStockUpdate", scrip, quantity, factor, price);
+    }
+}
